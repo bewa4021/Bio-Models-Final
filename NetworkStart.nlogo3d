@@ -1,47 +1,141 @@
 turtles-own [
   infected?    ;; has the person been infected with the disease?
+  network-num
 ]
 
-to setup
+to setup-1
   clear-all
   set-default-shape turtles "person"
-  repeat num-networks [make-turtles]
-  repeat num-networks [infect]
-  repeat num-networks [recolor]
-  repeat num-networks [make-network]
+  make-turtles-1
+  infect-1
+  recolor-1
+  make-network-1
   reset-ticks
 end
 
-to make-turtles
+to make-turtles-1
   create-turtles num-people [
+    set network-num 1
+    set infected? false
+    setxyz random-xcor random-ycor random-zcor
+  ]
+end
+
+to make-network-1
+  repeat connections-per-node * count turtles with [network-num = 1] / 2 [
+    ;; pick a random missing edge and create it
+    ask one-of turtles with [network-num = 1] [
+      create-link-with one-of other turtles with [network-num = 1] with [ not link-neighbor? myself ]
+    ]
+  ]
+  layout-circle turtles max-pxcor - 1
+  repeat 20 [ do-layout ]
+end
+
+to infect-1
+  ask n-of num-infected turtles with [network-num = 1][
+    set infected? true
+  ]
+end
+
+to recolor-1
+  ask turtles with [network-num = 1] [
+    ;; infected turtles are red, others are gray
+    set color ifelse-value infected? [ red ] [ blue ]
+  ]
+end
+
+;; ##############################################################
+;; ##############################################################
+
+to setup-2
+  ;; clear-all
+  set-default-shape turtles "person"
+  make-turtles-2
+  infect-2
+  recolor-2
+  make-network-2
+  reset-ticks
+end
+
+to make-turtles-2
+  create-turtles num-people [
+    set network-num 2
+    set infected? false
+    setxyz 2 + random-xcor 2 + random-ycor 2 + random-zcor
+  ]
+end
+
+to make-network-2
+  repeat connections-per-node * count turtles with [network-num = 2] / 2 [
+    ;; pick a random missing edge and create it
+    ask one-of turtles with [network-num = 2] [
+      create-link-with one-of other turtles with [network-num = 2] with [ not link-neighbor? myself ]
+    ]
+  ]
+  layout-circle turtles max-pxcor - 1
+  repeat 20 [ do-layout ]
+end
+
+to infect-2
+  ask n-of num-infected turtles with [network-num = 2] [
+    set infected? true
+  ]
+end
+
+to recolor-2
+  ask turtles with [network-num = 2] [
+    ;; infected turtles are red, others are gray
+    set color ifelse-value infected? [ green ] [ yellow ]
+  ]
+end
+
+
+;; ############################################################################
+;; ############################################################################
+
+to setup-3
+  ;; clear-all
+  set-default-shape turtles "person"
+  make-turtles-3
+  infect-3
+  recolor-3
+  make-network-3
+  reset-ticks
+end
+
+to make-turtles-3
+  create-turtles num-people [
+    set network-num 3
     set infected? false
     setxy random-xcor random-ycor
   ]
 end
 
-to make-network
+to make-network-3
   repeat connections-per-node * count turtles / 2 [
     ;; pick a random missing edge and create it
     ask one-of turtles [
       create-link-with one-of other turtles with [ not link-neighbor? myself ]
     ]
   ]
-  layout-circle turtles 10
+  layout-circle turtles max-pxcor - 1
   repeat 20 [ do-layout ]
 end
 
-to infect
+to infect-3
   ask n-of num-infected turtles [
     set infected? true
   ]
 end
 
-to recolor
+to recolor-3
   ask turtles [
     ;; infected turtles are red, others are gray
     set color ifelse-value infected? [ red ] [ gray ]
   ]
 end
+
 
 to do-layout
   layout-spring turtles with [ any? link-neighbors ] links 0.4 6 1
@@ -90,7 +184,7 @@ num-people
 num-people
 0
 100
-17.0
+90.0
 1
 1
 NIL
@@ -105,7 +199,7 @@ connections-per-node
 connections-per-node
 0
 5
-1.5
+1.0
 0.5
 1
 NIL
@@ -120,19 +214,19 @@ num-infected
 num-infected
 0
 10
-2.0
+5.0
 1
 1
 NIL
 HORIZONTAL
 
 BUTTON
-68
-172
-131
-205
+65
+302
+139
+335
 NIL
-setup
+setup-1
 NIL
 1
 T
@@ -152,11 +246,45 @@ num-networks
 num-networks
 1
 3
-3.0
+1.0
 1
 1
 NIL
 HORIZONTAL
+
+BUTTON
+181
+302
+255
+335
+NIL
+setup-2
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+283
+301
+357
+334
+NIL
+setup-3
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
 
 @#$#@#$#@
 ## WHAT IS IT?
