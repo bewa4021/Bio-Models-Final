@@ -3,6 +3,23 @@ turtles-own [
   network-num
 ]
 
+links-own [
+  network-number
+]
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Main Setup ;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+to setup
+  setup-1
+  setup-2
+  setup-3
+end
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Setup 1
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 to setup-1
   clear-all
   set-default-shape turtles "person"
@@ -14,26 +31,28 @@ to setup-1
 end
 
 to make-turtles-1
-  create-turtles num-people [
+  create-turtles num-people-1 [
     set network-num 1
     set infected? false
-    setxyz random-xcor random-ycor random-zcor
+    setxyz (5 - random-float 10) (5 - random-float 10)(5 - random-float 10)
   ]
 end
 
 to make-network-1
-  repeat connections-per-node * count turtles with [network-num = 1] / 2 [
+  repeat connections-per-node-1 * count turtles with [network-num = 1] / 2 [
     ;; pick a random missing edge and create it
     ask one-of turtles with [network-num = 1] [
-      create-link-with one-of other turtles with [network-num = 1] with [ not link-neighbor? myself ]
+      create-link-with one-of other turtles with [network-num = 1] with [ not link-neighbor? myself ] [
+        set network-number 1
+      ]
     ]
   ]
-  layout-circle turtles max-pxcor - 1
-  repeat 20 [ do-layout ]
+  ;;layout-circle turtles max-pxcor - 10
+  ;;repeat 20 [ do-layout-1 ]
 end
 
 to infect-1
-  ask n-of num-infected turtles with [network-num = 1][
+  ask n-of num-infected-1 turtles with [network-num = 1][
     set infected? true
   ]
 end
@@ -45,9 +64,14 @@ to recolor-1
   ]
 end
 
-;; ##############################################################
-;; ##############################################################
+to do-layout-1
+  layout-spring turtles with [network-num = 1] with [ any? link-neighbors ] links with [network-number = 1] 0.4 6 1
+  ;;display  ;; so we get smooth animation
+end
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Setup 2
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 to setup-2
   ;; clear-all
   set-default-shape turtles "person"
@@ -59,26 +83,28 @@ to setup-2
 end
 
 to make-turtles-2
-  create-turtles num-people [
+  create-turtles num-people-2 [
     set network-num 2
     set infected? false
-    setxyz 2 + random-xcor 2 + random-ycor 2 + random-zcor
+    setxyz (8 + random-float 8) (4 - random-float 8) (4 - random-float 8)
   ]
 end
 
 to make-network-2
-  repeat connections-per-node * count turtles with [network-num = 2] / 2 [
+  repeat connections-per-node-2 * count turtles with [network-num = 2] / 2 [
     ;; pick a random missing edge and create it
     ask one-of turtles with [network-num = 2] [
-      create-link-with one-of other turtles with [network-num = 2] with [ not link-neighbor? myself ]
+      create-link-with one-of other turtles with [network-num = 2] with [ not link-neighbor? myself ] [
+        set network-number 2
+      ]
     ]
   ]
-  layout-circle turtles max-pxcor - 1
-  repeat 20 [ do-layout ]
+  ;;layout-circle turtles max-pxcor - 1
+  ;;repeat 20 [ do-layout-2 ]
 end
 
 to infect-2
-  ask n-of num-infected turtles with [network-num = 2] [
+  ask n-of num-infected-2 turtles with [network-num = 2] [
     set infected? true
   ]
 end
@@ -91,8 +117,15 @@ to recolor-2
 end
 
 
-;; ############################################################################
-;; ############################################################################
+to do-layout-2
+  layout-spring turtles with [network-num = 2] with [ any? link-neighbors ] links with [network-number = 2] 0.4 6 1
+  ;;display  ;; so we get smooth animation
+end
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Setup 3
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 to setup-3
   ;; clear-all
@@ -105,46 +138,50 @@ to setup-3
 end
 
 to make-turtles-3
-  create-turtles num-people [
+  create-turtles num-people-3 [
     set network-num 3
     set infected? false
-    setxy random-xcor random-ycor
+    setxyz (4 - random-float 8) (8 + random-float 8) (4 - random-float 8)
   ]
 end
 
 to make-network-3
-  repeat connections-per-node * count turtles / 2 [
+  repeat connections-per-node-3 * count turtles with [network-num = 3] / 2 [
     ;; pick a random missing edge and create it
-    ask one-of turtles [
-      create-link-with one-of other turtles with [ not link-neighbor? myself ]
+    ask one-of turtles with [network-num = 3] [
+      create-link-with one-of other turtles with [network-num = 3] with [ not link-neighbor? myself ] [
+        set network-number 3
+      ]
     ]
   ]
-  layout-circle turtles max-pxcor - 1
-  repeat 20 [ do-layout ]
+  ;;layout-circle turtles max-pxcor - 1
+  ;;repeat 20 [ do-layout-2 ]
 end
 
 to infect-3
-  ask n-of num-infected turtles [
+  ask n-of num-infected-3 turtles with [network-num = 3] [
     set infected? true
   ]
 end
 
 to recolor-3
-  ask turtles [
+  ask turtles with [network-num = 3] [
     ;; infected turtles are red, others are gray
-    set color ifelse-value infected? [ red ] [ gray ]
+    set color ifelse-value infected? [ pink ] [ white ]
   ]
 end
 
 
-to do-layout
-  layout-spring turtles with [ any? link-neighbors ] links 0.4 6 1
-  display  ;; so we get smooth animation
+to do-layout-3
+  layout-spring turtles with [network-num = 3] with [ any? link-neighbors ] links with [network-number = 3] 0.4 6 1
+  ;;display  ;; so we get smooth animation
 end
 
-to move
-   repeat 10 [ do-layout ]
-end
+
+
+;;to move
+;;   repeat 10 [ do-layout ]
+;;end
 @#$#@#$#@
 GRAPHICS-WINDOW
 0
@@ -176,55 +213,55 @@ ticks
 30.0
 
 SLIDER
-97
-57
-269
-90
-num-people
-num-people
+25
+59
+197
+92
+num-people-1
+num-people-1
 0
 100
-90.0
+74.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-218
-125
-390
-158
-connections-per-node
-connections-per-node
+25
+95
+198
+128
+connections-per-node-1
+connections-per-node-1
 0
 5
-1.0
+0.5
 0.5
 1
 NIL
 HORIZONTAL
 
 SLIDER
-140
-191
-312
-224
-num-infected
-num-infected
+26
+132
+198
+165
+num-infected-1
+num-infected-1
 0
 10
-5.0
+7.0
 1
 1
 NIL
 HORIZONTAL
 
 BUTTON
-65
-302
-139
-335
+72
+178
+146
+211
 NIL
 setup-1
 NIL
@@ -237,26 +274,11 @@ NIL
 NIL
 1
 
-SLIDER
-373
-78
-545
-111
-num-networks
-num-networks
-1
-3
-1.0
-1
-1
-NIL
-HORIZONTAL
-
 BUTTON
-181
-302
-255
-335
+243
+176
+317
+209
 NIL
 setup-2
 NIL
@@ -270,12 +292,119 @@ NIL
 1
 
 BUTTON
-283
-301
-357
-334
+432
+175
+506
+208
 NIL
 setup-3
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+SLIDER
+208
+58
+380
+91
+num-people-2
+num-people-2
+0
+100
+26.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+207
+95
+381
+128
+connections-per-node-2
+connections-per-node-2
+0
+5
+1.5
+0.5
+1
+NIL
+HORIZONTAL
+
+SLIDER
+207
+131
+379
+164
+num-infected-2
+num-infected-2
+0
+10
+4.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+387
+58
+559
+91
+num-people-3
+num-people-3
+0
+100
+26.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+388
+96
+559
+129
+connections-per-node-3
+connections-per-node-3
+0
+5
+2.0
+0.5
+1
+NIL
+HORIZONTAL
+
+SLIDER
+388
+133
+560
+166
+num-infected-3
+num-infected-3
+0
+10
+4.0
+1
+1
+NIL
+HORIZONTAL
+
+BUTTON
+30
+11
+561
+44
+NIL
+setup
 NIL
 1
 T
