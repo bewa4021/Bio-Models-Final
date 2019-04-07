@@ -1,6 +1,7 @@
 turtles-own [
   infected?    ;; has the person been infected with the disease?
   network-num
+  link-num
 ]
 
 links-own [
@@ -11,9 +12,73 @@ links-own [
 ;;; Main Setup ;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 to setup
+  clear-all
+  link-networks
   setup-1
   setup-2
   setup-3
+  reset-ticks
+end
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; link Netowrks ;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+to link-networks
+  set-default-shape turtles "person"
+
+  create-turtles num-shared-1-2 [
+    set network-num 1
+    set link-num 12
+    set infected? false
+    setxyz (5 - random-float 10) (5 - random-float 10)(5 - random-float 10)
+  ]
+  create-turtles num-shared-1-2 [
+    set network-num 2
+    set link-num 12
+    set infected? false
+    setxyz (8 + random-float 8) (4 - random-float 8) (4 - random-float 8)
+  ]
+  ask turtles with [network-num = 2] [
+    create-link-with one-of other turtles with [ network-num = 1 ] with [any? link-neighbors = false] with [ not link-neighbor? myself ]
+  ]
+
+  create-turtles num-shared-1-3 [
+    set network-num 1
+    set link-num 13
+    set infected? false
+    setxyz (5 - random-float 10) (5 - random-float 10)(5 - random-float 10)
+  ]
+  create-turtles num-shared-1-3 [
+    set network-num 3
+    set link-num 13
+    set infected? false
+    setxyz (4 - random-float 8) (8 + random-float 8) (4 - random-float 8)
+  ]
+
+  ask turtles with [network-num = 3] [
+    create-link-with one-of other turtles with [ network-num = 1 ] with [any? link-neighbors = false] with [ not link-neighbor? myself ]
+  ]
+  create-turtles num-shared-2-3 [
+    set network-num 2
+    set link-num 23
+    set infected? false
+    setxyz (8 + random-float 8) (4 - random-float 8) (4 - random-float 8)
+  ]
+  create-turtles num-shared-2-3 [
+    set network-num 3
+    set link-num 23
+    set infected? false
+    setxyz (4 - random-float 8) (8 + random-float 8) (4 - random-float 8)
+  ]
+
+  ask turtles with [network-num = 3] with [any? link-neighbors = false] [
+    create-link-with one-of other turtles with [ network-num = 2 ] with [any? link-neighbors = false] with [ not link-neighbor? myself ]
+  ]
+
+  recolor-1
+  recolor-2
+  recolor-3
 end
 
 
@@ -21,19 +86,18 @@ end
 ;; Setup 1
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 to setup-1
-  clear-all
   set-default-shape turtles "person"
   make-turtles-1
   infect-1
   recolor-1
   make-network-1
-  reset-ticks
 end
 
 to make-turtles-1
   create-turtles num-people-1 [
     set network-num 1
     set infected? false
+    set link-num 0
     setxyz (5 - random-float 10) (5 - random-float 10)(5 - random-float 10)
   ]
 end
@@ -86,6 +150,7 @@ to make-turtles-2
   create-turtles num-people-2 [
     set network-num 2
     set infected? false
+    set link-num 0
     setxyz (8 + random-float 8) (4 - random-float 8) (4 - random-float 8)
   ]
 end
@@ -141,6 +206,7 @@ to make-turtles-3
   create-turtles num-people-3 [
     set network-num 3
     set infected? false
+    set link-num 0
     setxyz (4 - random-float 8) (8 + random-float 8) (4 - random-float 8)
   ]
 end
@@ -377,7 +443,7 @@ connections-per-node-3
 connections-per-node-3
 0
 5
-2.0
+4.0
 0.5
 1
 NIL
@@ -414,6 +480,68 @@ NIL
 NIL
 NIL
 1
+
+SLIDER
+109
+231
+281
+264
+num-shared-1-2
+num-shared-1-2
+0
+5
+3.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+316
+232
+488
+265
+num-shared-1-3
+num-shared-1-3
+0
+5
+3.0
+1
+1
+NIL
+HORIZONTAL
+
+BUTTON
+246
+291
+350
+324
+NIL
+link-networks
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+SLIDER
+138
+342
+310
+375
+num-shared-2-3
+num-shared-2-3
+0
+5
+1.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
