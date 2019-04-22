@@ -1,12 +1,20 @@
+extensions [rnd]
 turtles-own [
-  infected?    ;; has the person been infected with the disease?
+  infected?           ;; has the person been infected with the disease?
+  resistant?          ;; if true, the turtle can't be infected
+  virus-check-timer   ;; number of ticks since this turtle's last virus-check
   network-num
   link-num
+  age-range
+  gender
+  time-on-network
 ]
 
 links-own [
   network-number
 ]
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Main Setup ;;;;;;;;;;;;;;;;;;
@@ -25,18 +33,36 @@ end
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 to link-networks
+  let gender-facebook-probs [[0 .47] [1 .53]]
+  let gender-instagram-probs [[0 .47] [1 .53]]
+  let gender-reddit-probs [[0 .47] [1 .53]]
+
+  let ageRange-facebook-probs [[0 .03] [1 .17] [2 .25] [3 .55]]
+  let ageRange-reddit-probs [[0 .58] [1 .33] [2 .07] [3 .02]]
+  let ageRange-instagram-probs [[0 0.6] [1 .32] [2 .33] [3 .29]]
+
   set-default-shape turtles "person"
 
   create-turtles num-shared-1-2 [
     set network-num 1
     set link-num 12
     set infected? false
+    set resistant? false
+    set virus-check-timer random meme-check-frequency
+    set gender first rnd:weighted-one-of-list gender-facebook-probs last
+    set age-range first rnd:weighted-one-of-list ageRange-facebook-probs last
+    set time-on-network 35
     setxyz (5 - random-float 10) (5 - random-float 10)(5 - random-float 10)
   ]
   create-turtles num-shared-1-2 [
     set network-num 2
     set link-num 12
     set infected? false
+    set resistant? false
+    set virus-check-timer random meme-check-frequency
+    set gender first rnd:weighted-one-of-list gender-instagram-probs last
+    set age-range first rnd:weighted-one-of-list ageRange-instagram-probs last
+    set time-on-network 53
     setxyz (8 + random-float 8) (4 - random-float 8) (4 - random-float 8)
   ]
   ask turtles with [network-num = 2] [
@@ -47,12 +73,22 @@ to link-networks
     set network-num 1
     set link-num 13
     set infected? false
+    set resistant? false
+    set virus-check-timer random meme-check-frequency
+    set gender first rnd:weighted-one-of-list gender-facebook-probs last
+    set age-range first rnd:weighted-one-of-list ageRange-facebook-probs last
+    set time-on-network 35
     setxyz (5 - random-float 10) (5 - random-float 10)(5 - random-float 10)
   ]
   create-turtles num-shared-1-3 [
     set network-num 3
     set link-num 13
     set infected? false
+    set resistant? false
+    set virus-check-timer random meme-check-frequency
+    set gender first rnd:weighted-one-of-list gender-reddit-probs last
+    set age-range first rnd:weighted-one-of-list ageRange-reddit-probs last
+    set time-on-network 16
     setxyz (4 - random-float 8) (8 + random-float 8) (4 - random-float 8)
   ]
 
@@ -63,12 +99,22 @@ to link-networks
     set network-num 2
     set link-num 23
     set infected? false
+    set resistant? false
+    set virus-check-timer random meme-check-frequency
+    set gender first rnd:weighted-one-of-list gender-instagram-probs last
+    set age-range first rnd:weighted-one-of-list ageRange-instagram-probs last
+    set time-on-network 53
     setxyz (8 + random-float 8) (4 - random-float 8) (4 - random-float 8)
   ]
   create-turtles num-shared-2-3 [
     set network-num 3
     set link-num 23
     set infected? false
+    set resistant? false
+    set virus-check-timer random meme-check-frequency
+    set gender first rnd:weighted-one-of-list gender-reddit-probs last
+    set age-range first rnd:weighted-one-of-list ageRange-reddit-probs last
+    set time-on-network 16
     setxyz (4 - random-float 8) (8 + random-float 8) (4 - random-float 8)
   ]
 
@@ -91,13 +137,21 @@ to setup-1
   infect-1
   recolor-1
   make-network-1
+  reset-ticks
 end
 
 to make-turtles-1
+  let gender-facebook-probs [[0 .47] [1 .53]]
+  let ageRange-facebook-probs [[0 .03] [1 .17] [2 .25] [3 .55]]
   create-turtles num-people-1 [
     set network-num 1
     set infected? false
+    set resistant? false
     set link-num 0
+    set virus-check-timer random meme-check-frequency
+    set gender first rnd:weighted-one-of-list gender-facebook-probs last
+    set age-range first rnd:weighted-one-of-list ageRange-facebook-probs last
+    set time-on-network 35
     setxyz (5 - random-float 10) (5 - random-float 10)(5 - random-float 10)
   ]
 end
@@ -116,8 +170,8 @@ to make-network-1
 end
 
 to infect-1
-  ask n-of num-infected-1 turtles with [network-num = 1][
-    set infected? true
+  ask n-of num-memeing-1 turtles with [network-num = 1][
+    become-infected
   ]
 end
 
@@ -125,6 +179,7 @@ to recolor-1
   ask turtles with [network-num = 1] [
     ;; infected turtles are red, others are gray
     set color ifelse-value infected? [ red ] [ blue ]
+    if resistant? [set color gray]
   ]
 end
 
@@ -147,10 +202,17 @@ to setup-2
 end
 
 to make-turtles-2
+  let gender-instagram-probs [[0 .47] [1 .53]]
+  let ageRange-instagram-probs [[0 0.6] [1 .32] [2 .33] [3 .29]]
   create-turtles num-people-2 [
     set network-num 2
     set infected? false
+    set resistant? false
     set link-num 0
+    set virus-check-timer random meme-check-frequency
+    set gender first rnd:weighted-one-of-list gender-instagram-probs last
+    set age-range first rnd:weighted-one-of-list ageRange-instagram-probs last
+    set time-on-network 53
     setxyz (8 + random-float 8) (4 - random-float 8) (4 - random-float 8)
   ]
 end
@@ -169,15 +231,16 @@ to make-network-2
 end
 
 to infect-2
-  ask n-of num-infected-2 turtles with [network-num = 2] [
-    set infected? true
+  ask n-of num-memeing-2 turtles with [network-num = 2] [
+    become-infected
   ]
 end
 
 to recolor-2
   ask turtles with [network-num = 2] [
     ;; infected turtles are red, others are gray
-    set color ifelse-value infected? [ green ] [ yellow ]
+    set color ifelse-value infected? [ white ] [ violet ]
+    if resistant? [set color gray]
   ]
 end
 
@@ -203,10 +266,17 @@ to setup-3
 end
 
 to make-turtles-3
+  let gender-reddit-probs [[0 .47] [1 .53]]
+  let ageRange-reddit-probs [[0 .58] [1 .33] [2 .07] [3 .02]]
   create-turtles num-people-3 [
     set network-num 3
     set infected? false
+    set resistant? false
     set link-num 0
+    set virus-check-timer random meme-check-frequency
+    set gender first rnd:weighted-one-of-list gender-reddit-probs last
+    set age-range first rnd:weighted-one-of-list ageRange-reddit-probs last
+    set time-on-network 16
     setxyz (4 - random-float 8) (8 + random-float 8) (4 - random-float 8)
   ]
 end
@@ -225,15 +295,16 @@ to make-network-3
 end
 
 to infect-3
-  ask n-of num-infected-3 turtles with [network-num = 3] [
-    set infected? true
+  ask n-of num-memeing-3 turtles with [network-num = 3] [
+    become-infected
   ]
 end
 
 to recolor-3
   ask turtles with [network-num = 3] [
     ;; infected turtles are red, others are gray
-    set color ifelse-value infected? [ pink ] [ white ]
+    set color ifelse-value infected? [ cyan ] [ orange ]
+    if resistant? [set color gray]
   ]
 end
 
@@ -245,9 +316,75 @@ end
 
 
 
-;;to move
-;;   repeat 10 [ do-layout ]
-;;end
+;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; Go Function ;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;
+
+to go
+  if all? turtles [not infected?]
+    [ stop ]
+  ask turtles
+  [
+     set virus-check-timer virus-check-timer + 1
+     if virus-check-timer >= meme-check-frequency
+       [ set virus-check-timer 0 ]
+  ]
+  spread-virus
+  do-virus-checks
+  recolor-1
+  recolor-2
+  recolor-3
+  tick
+end
+
+to become-infected  ;; turtle procedure
+  set infected? true
+  set resistant? false
+  if (not (link-num = 0)) [
+    ask link-neighbors with [not (link-num = 1)] [
+     set infected? true
+     set resistant? false
+    ]
+  ]
+end
+
+to become-susceptible  ;; turtle procedure
+  set infected? false
+  set resistant? false
+end
+
+to become-resistant  ;; turtle procedure
+  set infected? false
+  set resistant? true
+  set color gray
+  ask my-links [ set color gray - 2 ]
+end
+
+to spread-virus
+  ask turtles with [infected?] [
+    let turtle-1-gender gender
+    let turtle-1-ageRange age-range
+    let turtle-1-time time-on-network
+    ask link-neighbors with [not resistant?] [
+      let virus-spread  10
+      if turtle-1-gender = gender [set virus-spread virus-spread + 25]
+      if turtle-1-ageRange = age-range [set virus-spread virus-spread + 25]
+      if turtle-1-time = time-on-network [set virus-spread virus-spread + 25]
+      if random-float 100 < virus-spread ;meme-spread-chance
+            [ become-infected ] ] ]
+end
+
+to do-virus-checks
+  ask turtles with [infected? and virus-check-timer = 0]
+  [
+    if random 100 < get-bored-chance
+    [
+      ifelse random 100 < gain-resistance-chance
+        [ become-resistant ]
+        [ become-susceptible ]
+    ]
+  ]
+end
 @#$#@#$#@
 GRAPHICS-WINDOW
 0
@@ -279,55 +416,55 @@ ticks
 30.0
 
 SLIDER
-25
-59
-197
-92
+14
+11
+186
+44
 num-people-1
 num-people-1
 0
 100
-74.0
+85.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-25
-95
-198
-128
+14
+47
+187
+80
 connections-per-node-1
 connections-per-node-1
 0
 5
-0.5
+1.5
 0.5
 1
 NIL
 HORIZONTAL
 
 SLIDER
-26
-132
-198
-165
-num-infected-1
-num-infected-1
+15
+84
+187
+117
+num-memeing-1
+num-memeing-1
 0
 10
-7.0
+4.0
 1
 1
 NIL
 HORIZONTAL
 
 BUTTON
-72
-178
-146
-211
+61
+130
+135
+163
 NIL
 setup-1
 NIL
@@ -341,10 +478,10 @@ NIL
 1
 
 BUTTON
-243
-176
-317
-209
+232
+128
+306
+161
 NIL
 setup-2
 NIL
@@ -358,10 +495,10 @@ NIL
 1
 
 BUTTON
-432
-175
-506
-208
+421
+127
+495
+160
 NIL
 setup-3
 NIL
@@ -375,100 +512,100 @@ NIL
 1
 
 SLIDER
-208
-58
-380
-91
+197
+10
+369
+43
 num-people-2
 num-people-2
 0
 100
-26.0
+35.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-207
-95
-381
-128
+196
+47
+370
+80
 connections-per-node-2
 connections-per-node-2
 0
 5
-1.5
+2.0
 0.5
 1
 NIL
 HORIZONTAL
 
 SLIDER
-207
-131
-379
-164
-num-infected-2
-num-infected-2
+196
+83
+368
+116
+num-memeing-2
+num-memeing-2
 0
 10
-4.0
+2.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-387
-58
-559
-91
+376
+10
+548
+43
 num-people-3
 num-people-3
 0
 100
-26.0
+10.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-388
-96
-559
-129
+377
+48
+548
+81
 connections-per-node-3
 connections-per-node-3
 0
 5
-4.0
+2.5
 0.5
 1
 NIL
 HORIZONTAL
 
 SLIDER
-388
-133
-560
-166
-num-infected-3
-num-infected-3
+377
+85
+549
+118
+num-memeing-3
+num-memeing-3
 0
 10
-4.0
+2.0
 1
 1
 NIL
 HORIZONTAL
 
 BUTTON
-30
-11
-561
-44
+368
+496
+725
+529
 NIL
 setup
 NIL
@@ -482,40 +619,40 @@ NIL
 1
 
 SLIDER
-109
-231
-281
-264
+14
+172
+186
+205
 num-shared-1-2
 num-shared-1-2
 0
 5
-3.0
+5.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-316
-232
-488
-265
+199
+171
+371
+204
 num-shared-1-3
 num-shared-1-3
 0
 5
-3.0
+5.0
 1
 1
 NIL
 HORIZONTAL
 
 BUTTON
-246
-291
-350
-324
+589
+10
+693
+43
 NIL
 link-networks
 NIL
@@ -529,19 +666,173 @@ NIL
 1
 
 SLIDER
-138
-342
-310
-375
+379
+171
+551
+204
 num-shared-2-3
 num-shared-2-3
 0
 5
-1.0
+3.0
 1
 1
 NIL
 HORIZONTAL
+
+SLIDER
+555
+54
+728
+87
+meme-check-frequency
+meme-check-frequency
+0
+20
+4.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+556
+93
+728
+126
+meme-spread-chance
+meme-spread-chance
+0
+100
+76.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+555
+132
+727
+165
+get-bored-chance
+get-bored-chance
+0
+100
+52.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+554
+171
+732
+204
+gain-resistance-chance
+gain-resistance-chance
+0
+100
+2.0
+1
+1
+NIL
+HORIZONTAL
+
+BUTTON
+551
+533
+614
+566
+NIL
+go
+T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+487
+533
+550
+566
+NIL
+go
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+PLOT
+3
+214
+360
+485
+Network-1 Status
+time
+% of nodes
+0.0
+52.0
+0.0
+100.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -14070903 true "" "plot (count turtles with [network-num = 1] with [not infected? and not resistant?]) / count turtles with [network-num = 1] * 100"
+"pen-1" 1.0 0 -2674135 true "" "plot (count turtles with [network-num = 1] with [infected?]) / count turtles with [network-num = 1] * 100"
+"pen-2" 1.0 0 -7500403 true "" "plot (count turtles with [network-num = 1] with [resistant?]) / count turtles with [network-num = 1] * 100"
+
+PLOT
+365
+214
+721
+487
+Network-2 Status
+time
+% of turtles
+0.0
+52.0
+0.0
+100.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -10141563 true "" "plot (count turtles with [network-num = 2] with [not infected? and not resistant?]) / count turtles with [network-num = 2] * 100"
+"pen-1" 1.0 0 -16777216 true "" "plot (count turtles with [network-num = 2] with [infected?]) / count turtles with [network-num = 2] * 100"
+"pen-2" 1.0 0 -7500403 true "" "plot (count turtles with [network-num = 2] with [resistant?]) / count turtles with [network-num = 2] * 100"
+
+PLOT
+4
+490
+354
+761
+Network-3 Status
+time
+% of people
+0.0
+52.0
+0.0
+100.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -817084 true "" "plot (count turtles with [network-num = 3] with [not infected? and not resistant?]) / count turtles with [network-num = 3] * 100"
+"pen-1" 1.0 0 -8990512 true "" "plot (count turtles with [network-num = 3] with [infected?]) / count turtles with [network-num = 3] * 100"
+"pen-2" 1.0 0 -7500403 true "" "plot (count turtles with [network-num = 3] with [resistant?]) / count turtles with [network-num = 3] * 100"
 
 @#$#@#$#@
 ## WHAT IS IT?
